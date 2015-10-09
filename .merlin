@@ -1,0 +1,5 @@
+S src
+B _build/src
+FLG -w +a-41-42-39-44-45-40
+PKG ppx_indexop
+PKG ppx_listlike

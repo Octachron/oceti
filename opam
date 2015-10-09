@@ -1,0 +1,18 @@
+opam-version: "1.2"
+name: "oceti"
+version: "0.1"
+maintainer: "octachron <octa@polychoron.fr>"
+authors:"octachron <octa@polychoron.fr>"
+homepage: ""
+bug-reports: ""
+license: "LGPL 3+ + Ocaml linking exception"
+build: [
+  [ "oasis" "setup" ]
+  ["./configure" "--prefix=%{prefix}%"]
+  [make]
+]
+install: [make "install"]
+remove: ["ocamlfind" "remove" "oceti"]
+depends: [
+  "ocamlfind" "oasis" {build}
+]

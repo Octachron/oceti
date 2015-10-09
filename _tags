@@ -1,0 +1,22 @@
+# OASIS_START
+# DO NOT EDIT (digest: 620c9d88bde91ef330b95b352c042c38)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library oceti
+"src/oceti.cmxs": use_oceti
+# OASIS_STOP
+true: warn(a-41-42-39-44-45-40)
+<src/*.ml>: package(ppx_listlike)
+<src/pack.ml>: package(ppx_indexop)
