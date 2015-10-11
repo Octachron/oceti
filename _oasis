@@ -11,5 +11,5 @@ XOCamlbuildExtraArgs: "-use-ocamlfind"
 
 Library "oceti"
   Path:       src
-  Modules: Range, Pack, Natl, Hlist, Nlist
+  Modules: Range, Pack, Natl, Hlist, Nlist, Tuple
 

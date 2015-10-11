@@ -1,18 +1,16 @@
-open Natl
+
+type void
 
 type _ t = 
-  | Nil: <f:'a; t:'a; dim:z > t
+  | Nil: void t
   | Cons:
-      'elt * <f:'ty; t:'ret; dim:'d > t -> <f: 'elt -> 'ty; t:'ret; dim:'d succ> t
+      'elt * 'a t -> ( 'elt * 'a ) t
 
-let rec apply : type arg ret d .
-  arg -> < f :arg; t:ret; dim:d> t -> ret = fun f l-> 
-  match l with 
-  | Nil -> f
-  | Cons (a,Nil) -> f a
-  | Cons(a, ( Cons _ as l ) ) -> apply (f a ) l
+let rec length: type a. a t -> int = function%with_ll
+  | [] -> 0
+  | _::q -> 1 + length q
 
-module Infix = struct
-  let (@@) f l = apply f l
-  let (|>) l f = apply f l  
-end
+let to_tuple_2 = function
+    | [%ll? [a;b] ] -> a, b
+
+let to_tuple_2 (a,b) = [%ll a; b]

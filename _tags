@@ -19,4 +19,4 @@ true: annot, bin_annot
 # OASIS_STOP
 true: warn(a-41-42-39-44-45-40)
 <src/*.ml>: package(ppx_listlike)
-<src/pack.ml>: package(ppx_indexop)
+<src/pack.ml> or <src/tuple.ml>: package(ppx_indexop)
