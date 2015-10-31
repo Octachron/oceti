@@ -49,7 +49,6 @@ let set: 'list t ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> '
 let cut_right: < focus:<list:'l; left:'ll; selected:'a; right:'r >; .. > Index.t -> 'l t -> 'll t =
   fun _n s -> Obj.magic s
 
-
 let fusion: < fusion:<list:'x; res:'l; tail:'y; ..>; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
   let ax, ay = Unsafe.(untype x, untype y) in
   let nx, ny = length x, length y in
@@ -58,13 +57,49 @@ let fusion: < fusion:<list:'x; res:'l; tail:'y; ..>; .. > Index.t -> 'x t -> 'y 
   for i=0 to ny - 1 do a.(i+nx) <- ay.(i) done;
   Unsafe.transmute a
 
+let map:
+  <  fusion: <
+         list:'l;
+         right:'r;
+         res:'l2;
+         sel:'a;
+         tail:'b * 'r > ;..>
+    Index.t -> ('a -> 'b ) -> 'l t -> 'l2 t = fun k f x ->
+  let a = Unsafe.untype @@ copy x in
+  a.(Index.to_int k) <- Obj.repr @@ f x.{k}; Unsafe.transmute a
+
+
+let map_all:
+  <  homogeneous: <
+         l1: <
+           list:'l;
+           tail:'r;
+           mono:'a
+         >;
+         l2: <
+           list:'l2;
+           tail:'r;
+           mono:'b
+         >
+       >; .. >
+    Index.t -> ('a -> 'b ) -> 'l t -> 'l2 t = fun k f x ->
+  let a = Unsafe.untype @@ copy x in
+  for k = 0 to Index.to_int k - 1 do
+    a.(k) <- Obj.repr @@ f @@ Obj.magic a.(k)
+  done;
+  Unsafe.transmute a
+    
 
 open Index.Defs
 let x = make _2 1 "hi"
 let y = make _3 [2] [|6|] "hi"    
 let xy = fusion _2 x y
 
+let w = map _0 float x
 
+let h1 = make _3 1 2 "hi"
+
+let h2 = map_all _1 float h1
 
 module Test = struct 
 
@@ -81,7 +116,6 @@ module Test = struct
     arr.{_0} <- 4;
     arr.{_0}
 end
-
 
 module Slice = struct
 type 'a s
