@@ -6,8 +6,11 @@ type _ t =
           l1 : < mono:'h1_a; list: 'h1_a * 'h1_t; tail:'h1_t >;
           l2: < mono: 'h2_a; list: 'h2_a * 'h2_t; tail: 'h2_t >
         >; 
-      focus: <list:'a * 'b; left: void; selected: 'a; right: 'b>;
-      fusion: <list:'a2 * 'b2; sel:'a2;  res:'o2; tail:'o2; right:'b2 >;
+      focus: <
+        list:'a2 * 'b2;
+        zipper: <left:void; sel:'a2; right:'b2>;
+        open_: <list:'o2; tail:'o2>
+      >;
       make:<typ:'res; res:'res; list:'t_f; tail:'t_f >
       > t
   | S : <
@@ -16,8 +19,11 @@ type _ t =
           l1 : < mono:'h1_m; list: 'h1_l; tail:'h1_t >;
           l2: < mono: 'h2_m; list: 'h2_l; tail:'h2_t >
         >; 
-      focus: <list:'l;  left: 'le; selected: 's; right: 'r>;
-      fusion: <list:'l2; sel:'s2; res:'r2; tail:'t2; right:'b2 >;
+      focus: <
+        list:'l;
+        zipper:<left: 'le; sel: 's; right: 'r>;
+        open_: < list:'lo; tail: 'to_ >
+      >;
       make: <typ:'f; res:'res; list:'l_f; tail:'t_f>
       > t
       -> <
@@ -26,8 +32,11 @@ type _ t =
             l1 : < mono:'h1_m; list: 'h1_m * 'h1_l; tail:'h1_t >;
             l2: < mono: 'h2_m; list: 'h2_m * 'h2_l; tail:'h2_t >
           >; 
-        focus: <list:'a*'l; left: 'a * 'le; selected: 's; right: 'r >;
-        fusion:<list:'elt2*'l2; res:'elt2 * 'r2; tail:'t2; sel:'s2; right:'b2>;
+        focus: <
+          list:'a * 'l;
+          zipper: < left: 'a * 'le; sel: 's; right: 'r >;
+          open_: <list:'a * 'lo; tail: 'to_ >
+        >;
         make: <typ:'a_f -> 'f; res:'res; list: 'a_f * 'l_f; tail:'t_f  >
       > t
 

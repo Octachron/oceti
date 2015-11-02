@@ -15,10 +15,10 @@ let to_tuple_2 = function
 
 let from_tuple_2 (a,b) = [%ll a; b]
 
-let rec make_kont: type l res f fusion h focus.
-  <
+let rec make_kont: type l res f h focus.
+      <
     make: <res:res; typ:f; list:l; tail:Types.void >;
-    fusion:fusion; homogeneous:h; focus:focus;
+    homogeneous:h; focus:focus;
   > Index.t
   -> ( l t -> res )
   -> f  = function

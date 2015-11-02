@@ -35,7 +35,7 @@ let length x =
   x |> Unsafe.untype |> Array.length
 
 [%%indexop
-let get: 'list t -> < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r =
+let get: 'list t -> < focus: <list:'list; zipper:<sel:'r; ..>; .. > ; .. > Index.t -> 'r =
   fun array index ->
     let array  = Unsafe.untype array in
     Obj.magic array.( Index.to_int index)
@@ -46,10 +46,15 @@ let get: 'list t -> < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r
 ]
 
 
-let cut_right: < focus:<list:'l; left:'ll; selected:'a; right:'r >; .. > Index.t -> 'l t -> 'll t =
+let cut_right: < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; .. >; .. > Index.t -> 'l t -> 'll t =
   fun _n s -> Obj.magic s
 
-let fusion: < fusion:<list:'x; res:'l; tail:'y; right:Types.void; .. >; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
+let fusion: <
+  focus:<
+    list:'x;
+    open_:<list:'l; tail:'y>;
+    zipper:<right:Types.void; ..>;
+    .. >; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
   let ax, ay = Unsafe.(untype x, untype y) in
   let nx, ny = length x, length y in
   let a = Array.make (nx+ny) @@ Obj.repr 0 in
@@ -58,12 +63,11 @@ let fusion: < fusion:<list:'x; res:'l; tail:'y; right:Types.void; .. >; .. > Ind
   Unsafe.transmute a
 
 let map:
-  <  fusion: <
+  <  focus: <
          list:'l;
-         right:'r;
-         res:'l2;
-         sel:'a;
-         tail:'b * 'r > ;..>
+         zipper:< right:'r;  sel:'a; ..>;
+         open_: <list:'l2; tail:'b * 'r>;
+        .. > ;..>
     Index.t -> ('a -> 'b ) -> 'l t -> 'l2 t = fun k f x ->
   let a = Unsafe.untype @@ copy x in
   a.(Index.to_int k) <- Obj.repr @@ f x.{k}; Unsafe.transmute a
@@ -103,10 +107,14 @@ let length s =
 
 let full: 'a t -> 'a s = fun a -> transmute { offset=0; array=Unsafe.untype a }
 
-let cut_left: < focus:<list:'l; left:'ll; selected:'a; right:'r >; .. > Index.t -> 'l s -> ('a*'r) s =
+let cut_left:
+  < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; .. >; .. > Index.t
+  -> 'l s -> ('a*'r) s =
   fun n s -> let s = untype s in transmute { s with offset= Index.to_int n + s.offset }
 
-let cut_right: < focus:<list:'l; left:'ll; selected:'a; right:'r >; .. > Index.t -> 'l s -> 'll s =
+let cut_right:
+  < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; ..  >; .. > Index.t
+  -> 'l s -> 'll s =
   fun _n s -> Obj.magic s
 
 let cut l r s =
@@ -120,7 +128,8 @@ let copy : 'a s -> 'a t = fun s ->
   Unsafe.transmute @@ Array.init (length s) (fun i -> array.( i + offset ) )
 
 [%%indexop
-let get: 'list s -> < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r =
+  let get: 'list s ->
+    < focus: <list:'list; zipper:<sel:'r; .. > ; .. > ; .. > Index.t -> 'r =
   fun slice index ->
     let slice  = untype slice in
     Obj.magic slice.array.( slice.offset + Index.to_int index)
