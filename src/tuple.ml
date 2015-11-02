@@ -1,7 +1,7 @@
 
 (* 'a t is internaly an Obj.t array, but this representation is
 unsafe and hidden away *)
-type 'a t
+type +'a t
 
 module Unsafe = struct
   let untype: 'a t -> Obj.t array = Obj.magic
@@ -39,17 +39,17 @@ let get: 'list t -> < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r
   fun array index ->
     let array  = Unsafe.untype array in
     Obj.magic array.( Index.to_int index)
-let set: 'list t ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
+(* let set: 'list t ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
   fun array index value ->
     let array = Unsafe.untype array in
-    array.(Index.to_int index) <- Obj.repr value
+    array.(Index.to_int index) <- Obj.repr value *)
 ]
 
 
 let cut_right: < focus:<list:'l; left:'ll; selected:'a; right:'r >; .. > Index.t -> 'l t -> 'll t =
   fun _n s -> Obj.magic s
 
-let fusion: < fusion:<list:'x; res:'l; tail:'y; ..>; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
+let fusion: < fusion:<list:'x; res:'l; tail:'y; right:Types.void; .. >; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
   let ax, ay = Unsafe.(untype x, untype y) in
   let nx, ny = length x, length y in
   let a = Array.make (nx+ny) @@ Obj.repr 0 in
@@ -90,39 +90,16 @@ let map_all:
   Unsafe.transmute a
     
 
-open Index.Defs
-let x = make _2 1 "hi"
-let y = make _3 [2] [|6|] "hi"    
-let xy = fusion _2 x y
-
-let w = map _0 float x
-
-let h1 = make _3 1 2 "hi"
-
-let h2 = map_all _1 float h1
-
-module Test = struct 
-
-  open Index.Defs
-         
-  let arr =
-  make _5 1 2 4 (fun x ->  x lsl 4) (+)
-
-  let n = arr.{_0}
-  let hi = arr.{_1}
-  let some = arr.{_2}
-  let k = arr.{_3} n             
-  let n' =
-    arr.{_0} <- 4;
-    arr.{_0}
-end
-
 module Slice = struct
 type 'a s
 type raw = {offset :int; array: Obj.t array }
 
 let untype: 'a s -> raw = Obj.magic
 let transmute: raw -> 'a s = Obj.magic                                        
+
+let length s =
+  let r = untype s in
+  Array.length r.array -r.offset 
 
 let full: 'a t -> 'a s = fun a -> transmute { offset=0; array=Unsafe.untype a }
 
@@ -138,33 +115,19 @@ let cut l r s =
 let make k a =
   cut_left k @@ full a
 
+let copy : 'a s -> 'a t = fun s ->
+  let {array;offset} = untype s in
+  Unsafe.transmute @@ Array.init (length s) (fun i -> array.( i + offset ) )
+
 [%%indexop
 let get: 'list s -> < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r =
   fun slice index ->
     let slice  = untype slice in
     Obj.magic slice.array.( slice.offset + Index.to_int index)
-let set: 'list s ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
+(*let set: 'list s ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
   fun slice index value ->
     let slice  = untype slice in
-    slice.array.( slice.offset + Index.to_int index) <- Obj.repr value 
+    slice.array.( slice.offset + Index.to_int index) <- Obj.repr value  *)
 ]
-
-
-end
-
-let s = let open Index.Defs in Slice.make _1 Test.arr
-
-
-module More_test = struct
-
-open Test
-let id x = x
-open Index.Defs
-let f tuple =
-  tuple.{_4} tuple.{_2} @@ tuple.{_0} + tuple.{_1}
-
-let m = f arr
-
-
 
 end

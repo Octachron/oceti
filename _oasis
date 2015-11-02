@@ -13,3 +13,9 @@ Library "oceti"
   Path:       src
   Modules: Range, Pack, Natl, Hlist, Nlist, Tuple
 
+Executable "tuple"
+  Path:  examples
+  MainIs: tuples.ml
+  Install: false
+  BuildDepends: oceti
+  CompiledObject: best

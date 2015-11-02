@@ -2,7 +2,7 @@
 type void = Types.void
 
 type _ t = 
-  | Nil: (void * void) t
+  | Nil: void t
   | Cons:
       'elt * 'a t -> ( 'elt * 'a ) t
 
@@ -15,10 +15,10 @@ let to_tuple_2 = function
 
 let from_tuple_2 (a,b) = [%ll a; b]
 
-let rec make_kont: type l le res f fusion h.
+let rec make_kont: type l res f fusion h focus.
   <
-    focus: <list:l; selected: Types.void; left:le; right: void >;
-    f:<res:res; typ:f>; fusion:fusion; homogeneous:h
+    make: <res:res; typ:f; list:l; tail:Types.void >;
+    fusion:fusion; homogeneous:h; focus:focus;
   > Index.t
   -> ( l t -> res )
   -> f  = function

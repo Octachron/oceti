@@ -8,7 +8,7 @@ type _ t =
         >; 
       focus: <list:'a * 'b; left: void; selected: 'a; right: 'b>;
       fusion: <list:'a2 * 'b2; sel:'a2;  res:'o2; tail:'o2; right:'b2 >;
-      f:<typ:'res; res:'res>
+      make:<typ:'res; res:'res; list:'t_f; tail:'t_f >
       > t
   | S : <
       homogeneous:
@@ -17,8 +17,8 @@ type _ t =
           l2: < mono: 'h2_m; list: 'h2_l; tail:'h2_t >
         >; 
       focus: <list:'l;  left: 'le; selected: 's; right: 'r>;
-      fusion:<list:'l2; sel:'s2; res:'r2; tail:'t2; right:'b2 >;
-        f:<typ:'f; res:'res>
+      fusion: <list:'l2; sel:'s2; res:'r2; tail:'t2; right:'b2 >;
+      make: <typ:'f; res:'res; list:'l_f; tail:'t_f>
       > t
       -> <
         homogeneous:
@@ -28,7 +28,7 @@ type _ t =
           >; 
         focus: <list:'a*'l; left: 'a * 'le; selected: 's; right: 'r >;
         fusion:<list:'elt2*'l2; res:'elt2 * 'r2; tail:'t2; sel:'s2; right:'b2>;
-        f:<typ:'a -> 'f; res:'res>
+        make: <typ:'a_f -> 'f; res:'res; list: 'a_f * 'l_f; tail:'t_f  >
       > t
 
 
