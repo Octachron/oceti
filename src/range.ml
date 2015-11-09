@@ -112,3 +112,4 @@ module Infix = struct
   let (--* ) start end_ = start -- ( end_ - 1 ) 
   let (-->) = linrange
 end
+include Infix
