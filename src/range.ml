@@ -19,11 +19,13 @@ type _ t =
   | Seq : 'a t list -> 'a t
 
 let range ?(start=0) end_ = Lin ( Int.range ~start end_ )
+let integer = range
 
 let linrange start stop step =
   let len =  int_of_float ( (stop -. start) /. step ) in
   let f n =  start +.  float_of_int n  *.  step in
   LinMap( f, Int.range (len-1) )
+let linear =linrange
 
 module Helper = struct
 let ( |- ) f g x = f @@ g x
