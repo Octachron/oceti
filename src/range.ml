@@ -68,7 +68,12 @@ let rec fold: type acc f. (acc -> f ) -> acc
     | Seq rs ->
       List.fold_left (fold f) acc rs
 
-let to_list zip range = fold (fun l x -> zip x :: l)  [] range
+let to_list_k zip range =
+  let kont l x = x :: l in
+  let folder l = zip @@ kont l in
+  fold folder  [] range
+
+let to_list range = to_list_k (@@) range
 
 let iter_on range f = iter f range
 let fold_on range f acc = fold f acc range    
