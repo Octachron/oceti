@@ -1,12 +1,12 @@
 open Natl
 
 type _ t = 
-  | Nil: <f:'a; t:'a; dim:z > t
+  | Nil: < fun_type:'a; return:'a; arity:z > t
   | Cons:
-      'elt * <f:'ty; t:'ret; dim:'d > t -> <f: 'elt -> 'ty; t:'ret; dim:'d succ> t
+      'elt * < fun_type:'ty; return:'ret; arity:'b > t -> < fun_type: 'elt -> 'ty; return:'ret; arity:'n succ> t
 
-let rec apply : type arg ret d .
-  arg -> < f :arg; t:ret; dim:d> t -> ret = fun f l-> 
+let rec apply : type f ret n.
+  f -> < fun_type :f; return:ret; arity:n > t -> ret = fun f l-> 
   match l with 
   | Nil -> f
   | Cons (a,Nil) -> f a
