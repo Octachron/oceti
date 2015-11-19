@@ -1,7 +1,13 @@
+(** 
+   Tuple is an alternative encoding of immutable n-tuple using phantom type and 
+   Obj.magic to build a generic tuple type as an hetereogeneous array.
+*)
+
 
 (* 'a t is internaly an Obj.t array, but this representation is
 unsafe and hidden away *)
 type +'a t
+type +'a tuple = 'a t  
 
 module Unsafe = struct
   let untype: 'a t -> Obj.t array = Obj.magic
@@ -11,9 +17,10 @@ end
 
 type void = Types.void
 
-  (* Hlist.t are well typed and can be easily constructed using list 
+(* Hlist.t are well typed and can be easily constructed using list 
    syntax (from ppx_listlike). Therefore, there are good inializers
-   for generic tuple *)
+   for generic tuple 
+*)
 let from_list (l:'a Hlist.t) : 'a t =
   let open Hlist in
   let n = Hlist.length l in 
@@ -26,7 +33,9 @@ let from_list (l:'a Hlist.t) : 'a t =
     write 0 l in
   Unsafe.transmute array
 
-let make n = Hlist.make_kont n from_list
+(* [create ''n a_1 ... a_n] creates the tuple (a_1,...,a_n) *)
+let create n = Hlist.make_kont n from_list
+let tuple = create
 
 let copy: 'a t -> 'a t = fun a ->
   a |> Unsafe.untype |> Array.copy |> Unsafe.transmute
@@ -34,7 +43,7 @@ let copy: 'a t -> 'a t = fun a ->
 let length x =
   x |> Unsafe.untype |> Array.length
 
-[%%indexop
+
 let get: 'list t -> < focus: <list:'list; zipper:<sel:'r; ..>; .. > ; .. > Index.t -> 'r =
   fun array index ->
     let array  = Unsafe.untype array in
@@ -43,7 +52,8 @@ let get: 'list t -> < focus: <list:'list; zipper:<sel:'r; ..>; .. > ; .. > Index
   fun array index value ->
     let array = Unsafe.untype array in
     array.(Index.to_int index) <- Obj.repr value *)
-]
+
+let%indexop get = get
 
 
 let cut_right: < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; .. >; .. > Index.t -> 'l t -> 'll t =
@@ -95,40 +105,42 @@ let map_all:
     
 
 module Slice = struct
-type 'a s
-type raw = {offset :int; array: Obj.t array }
+  type 'a t
+  type 'a slice = 'a t
+      
+  type raw = {offset :int; array: Obj.t array }
 
-let untype: 'a s -> raw = Obj.magic
-let transmute: raw -> 'a s = Obj.magic                                        
+  let untype: 'a slice -> raw = Obj.magic
+  let transmute: raw -> 'a slice = Obj.magic                                        
 
 let length s =
   let r = untype s in
   Array.length r.array -r.offset 
 
-let full: 'a t -> 'a s = fun a -> transmute { offset=0; array=Unsafe.untype a }
+let full: 'a tuple -> 'a slice = fun a -> transmute { offset=0; array=Unsafe.untype a }
 
 let cut_left:
   < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; .. >; .. > Index.t
-  -> 'l s -> ('a*'r) s =
+  -> 'l slice -> ('a*'r) slice =
   fun n s -> let s = untype s in transmute { s with offset= Index.to_int n + s.offset }
 
 let cut_right:
   < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; ..  >; .. > Index.t
-  -> 'l s -> 'll s =
+  -> 'l slice -> 'll slice =
   fun _n s -> Obj.magic s
 
 let cut l r s =
   s |> cut_right r |> cut_left l
 
-let make k a =
+let create k a =
   cut_left k @@ full a
 
-let copy : 'a s -> 'a t = fun s ->
+let copy : 'a slice -> 'a tuple = fun s ->
   let {array;offset} = untype s in
   Unsafe.transmute @@ Array.init (length s) (fun i -> array.( i + offset ) )
 
 [%%indexop
-  let get: 'list s ->
+  let get: 'list slice ->
     < focus: <list:'list; zipper:<sel:'r; .. > ; .. > ; .. > Index.t -> 'r =
   fun slice index ->
     let slice  = untype slice in
