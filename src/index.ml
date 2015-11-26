@@ -1,11 +1,17 @@
+(* Upon reading this source code, lose 1d6 SAN points *)
+
+(* empty type *)
 type void = Types.void
+
+(*  Index type: collections of non-applied type-level function
+used by index consumer. *)
 type _ t =
   | Z :  <
       homogeneous:
         <
           l1 : < mono:'h1_a; list: 'h1_a * 'h1_t; tail:'h1_t >;
           l2: < mono: 'h2_a; list: 'h2_a * 'h2_t; tail: 'h2_t >
-        >; 
+        >;
       focus: <
         list:'a2 * 'b2;
         zipper: <left:void; sel:'a2; right:'b2>;
@@ -31,7 +37,7 @@ type _ t =
           <
             l1 : < mono:'h1_m; list: 'h1_m * 'h1_l; tail:'h1_t >;
             l2: < mono: 'h2_m; list: 'h2_m * 'h2_l; tail:'h2_t >
-          >; 
+          >;
         focus: <
           list:'a * 'l;
           zipper: < left: 'a * 'le; sel: 's; right: 'r >;
@@ -41,8 +47,10 @@ type _ t =
       > t
 
 
+
 let rec to_int: type a. a t -> int = function Z -> 0 | S k -> 1 + to_int k
 
+(* Predefined index *)
 module Defs = struct
 let _0 = Z
 let _1 = S _0
@@ -50,6 +58,9 @@ let _2 = S _1
 let _3 = S _2
 let _4 = S _3
 let _5 = S _4
-let _6 = S _5    
-
+let _6 = S _5
+let _7 = S _6
+let _8 = S _7
+let _9 = S _8
+let _10 = S _9
 end
