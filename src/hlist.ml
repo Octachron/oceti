@@ -1,7 +1,7 @@
 
 type void = Types.void
 
-type _ t = 
+type _ t =
   | Nil: void t
   | Cons:
       'elt * 'a t -> ( 'elt * 'a ) t
@@ -27,8 +27,5 @@ let rec make_kont: type l res f h focus.
     let k = make_kont k in
     fun kont x -> k ( fun acc -> kont @@ Cons(x,acc) )
 
-
 let make k = make_kont k (fun x -> x)
-
-open Index.Defs
-let t = make _2 2 3.
+let hlist = make
