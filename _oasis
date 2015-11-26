@@ -32,3 +32,9 @@ Executable "packs"
   MainIs: packs.ml
   Install: false
   BuildDepends: oceti
+
+Executable "lists"
+  Path:  examples
+  MainIs: lists.ml
+  Install: false
+  BuildDepends: oceti

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 23a1159270938825e3998eba060e07f8)
+# DO NOT EDIT (digest: 84e353728e1978c62b7993613250705b)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -22,6 +22,8 @@ true: annot, bin_annot
 <examples/ranges.{native,byte}>: use_oceti
 # Executable packs
 "examples/packs.byte": use_oceti
+# Executable lists
+"examples/lists.byte": use_oceti
 <examples/*.ml{,i,y}>: use_oceti
 # OASIS_STOP
 true: warn(a-41-42-39-44-45-40)
