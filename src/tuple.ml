@@ -1,4 +1,4 @@
-(** 
+(**
    Tuple is an alternative encoding of immutable n-tuple using phantom type and 
    Obj.magic to build a generic tuple type as an hetereogeneous array.
 *)
@@ -7,7 +7,7 @@
 (* 'a t is internaly an Obj.t array, but this representation is
 unsafe and hidden away *)
 type +'a t
-type +'a tuple = 'a t  
+type +'a tuple = 'a t
 
 module Unsafe = struct
   let untype: 'a t -> Obj.t array = Obj.magic
@@ -19,11 +19,11 @@ type void = Types.void
 
 (* Hlist.t are well typed and can be easily constructed using list 
    syntax (from ppx_listlike). Therefore, there are good inializers
-   for generic tuple 
+   for generic tuple
 *)
 let from_list (l:'a Hlist.t) : 'a t =
   let open Hlist in
-  let n = Hlist.length l in 
+  let n = Hlist.length l in
   let array = Array.make n @@ Obj.repr 0 in
   let rec write: type a. int -> a t -> unit = fun k ->
     function%with_ll
@@ -48,10 +48,13 @@ let get: 'list t -> < focus: <list:'list; zipper:<sel:'r; ..>; .. > ; .. > Index
   fun array index ->
     let array  = Unsafe.untype array in
     Obj.magic array.( Index.to_int index)
-(* let set: 'list t ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
+
+(*
+let set: 'list t ->  < focus: <list:'list; selected:'r; .. > ; .. > Index.t -> 'r -> unit =
   fun array index value ->
     let array = Unsafe.untype array in
-    array.(Index.to_int index) <- Obj.repr value *)
+    array.(Index.to_int index) <- Obj.repr value 
+*)
 
 let%indexop get = get
 
@@ -59,7 +62,7 @@ let%indexop get = get
 let cut_right: < focus:<list:'l; zipper:<left:'ll; sel:'a; right:'r>; .. >; .. > Index.t -> 'l t -> 'll t =
   fun _n s -> Obj.magic s
 
-let fusion: <
+let append: <
   focus:<
     list:'x;
     open_:<list:'l; tail:'y>;
@@ -67,9 +70,12 @@ let fusion: <
     .. >; .. > Index.t -> 'x t -> 'y t -> 'l t = fun _n x y ->
   let ax, ay = Unsafe.(untype x, untype y) in
   let nx, ny = length x, length y in
-  let a = Array.make (nx+ny) @@ Obj.repr 0 in
-  for i=0 to nx-1 do a.(i)<- ax.(i) done;
-  for i=0 to ny - 1 do a.(i+nx) <- ay.(i) done;
+  let a = Array.init (nx+ny) (fun k ->
+      if k < nx then
+        ax.(k)
+      else
+        ay.(k-nx)
+    ) in
   Unsafe.transmute a
 
 let map:
@@ -102,20 +108,20 @@ let map_all:
     a.(k) <- Obj.repr @@ f @@ Obj.magic a.(k)
   done;
   Unsafe.transmute a
-    
+
 
 module Slice = struct
   type 'a t
   type 'a slice = 'a t
-      
+
   type raw = {offset :int; array: Obj.t array }
 
   let untype: 'a slice -> raw = Obj.magic
-  let transmute: raw -> 'a slice = Obj.magic                                        
+  let transmute: raw -> 'a slice = Obj.magic
 
 let length s =
   let r = untype s in
-  Array.length r.array -r.offset 
+  Array.length r.array -r.offset
 
 let full: 'a tuple -> 'a slice = fun a -> transmute { offset=0; array=Unsafe.untype a }
 

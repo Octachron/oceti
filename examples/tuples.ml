@@ -4,7 +4,7 @@ open Tuple
 
 let x = tuple _2 1 "hi"
 let y = tuple _3 [2] [|6|] "hi"    
-let xy = fusion _1 x y
+let xy = append _1 x y
 
 let k = x.{_1}
 let w = map _0 float x
