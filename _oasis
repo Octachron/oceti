@@ -11,11 +11,24 @@ XOCamlbuildExtraArgs: "-use-ocamlfind"
 
 Library "oceti"
   Path:       src
-  Modules: Range, Pack, Natl, Hlist, Nlist, Tuple
+  Modules: Range, Pack, Natl, Hlist, Flist, Nlist, Tuple, Index
 
-Executable "tuple"
+Executable "tuples"
   Path:  examples
   MainIs: tuples.ml
   Install: false
   BuildDepends: oceti
   CompiledObject: best
+
+Executable "ranges"
+  Path:  examples
+  MainIs: ranges.ml
+  Install: false
+  BuildDepends: oceti
+  CompiledObject: best
+
+Executable "packs"
+  Path:  examples
+  MainIs: packs.ml
+  Install: false
+  BuildDepends: oceti
